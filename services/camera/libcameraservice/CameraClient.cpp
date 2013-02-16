@@ -90,7 +90,6 @@ status_t CameraClient::initialize(camera_module_t *module) {
 #ifndef OMAP_ICS_CAMERA
                   | CAMERA_MSG_FOCUS_MOVE
 #endif
-#endif
                  );
 
     LOG1("CameraClient::initialize X (pid %d, id %d)", callingPid, mCameraId);
