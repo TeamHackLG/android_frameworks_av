@@ -313,6 +313,11 @@ const char CameraParameters::KEY_SUPPORTED_SKIN_TONE_ENHANCEMENT_MODES[] = "skin
 // Values for ISO Settings
 const char CameraParameters::ISO_AUTO[] = "auto";
 const char CameraParameters::ISO_HJR[] = "ISO_HJR";
+#ifdef ADDITIONAL_ISO_MODES
+const char CameraParameters::ISO_SPORTS[] = "ISO_SPORTS";
+const char CameraParameters::ISO_NIGHT[] = "ISO_NIGHT";
+const char CameraParameters::ISO_MOVIE[] = "ISO_MOVIE";
+#endif
 #ifdef SAMSUNG_CAMERA_QCOM
 const char CameraParameters::FOCUS_MODE_FACEDETECT[] = "facedetect";
 const char CameraParameters::FOCUS_MODE_TOUCHAF[] = "touchaf";

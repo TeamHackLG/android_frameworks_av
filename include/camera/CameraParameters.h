@@ -863,6 +863,11 @@ public:
     static const char FOCUS_MODE_NORMAL[];
     static const char ISO_AUTO[];
     static const char ISO_HJR[] ;
+#ifdef ADDITIONAL_ISO_MODES
+    static const char ISO_SPORTS[] ;
+    static const char ISO_NIGHT[] ;
+    static const char ISO_MOVIE[] ;
+#endif
 #ifdef SAMSUNG_CAMERA_QCOM
     static const char FOCUS_MODE_FACEDETECT[];
     static const char FOCUS_MODE_TOUCHAF[];
