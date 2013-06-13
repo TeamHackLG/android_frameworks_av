@@ -62,6 +62,7 @@
 #include <system/audio.h>
 #ifdef QCOM_HARDWARE
 #include <QCMediaDefs.h>
+#include <cutils/properties.h>
 #endif
 
 #include "ARTPWriter.h"
@@ -1463,11 +1464,15 @@ status_t StagefrightRecorder::setupCameraSource(
         *cameraSource = mCameraSourceTimeLapse;
     } else {
         bool useMeta = true;
-
-#ifdef QCOM_LEGACY_OMX
+#if defined(QCOM_LEGACY_OMX)
              useMeta = false;
+#elif defined(QCOM_HARDWARE)
+        char value[PROPERTY_VALUE_MAX];
+        if (property_get("debug.camcorder.disablemeta", value, NULL) &&
+            atoi(value)) {
+            useMeta = false;
+        }
 #endif
-
         *cameraSource = CameraSource::CreateFromCamera(
                 mCamera, mCameraProxy, mCameraId, videoSize, mFrameRate,
                 mPreviewSurface, useMeta /*storeMetaDataInVideoBuffers*/);
