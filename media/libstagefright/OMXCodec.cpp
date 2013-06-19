@@ -1746,7 +1746,7 @@ OMXCodec::OMXCodec(
               || !strncmp(componentName, "OMX.qcom",8)
 #endif
       )
-                        ? NULL : nativeWindow) {
+                       ? NULL : nativeWindow)
 #ifdef QCOM_HARDWARE
       ,mNumBFrames(0)
 #endif
