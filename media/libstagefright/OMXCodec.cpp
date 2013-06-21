@@ -67,7 +67,7 @@
 #include <sec_format.h>
 #endif
 
-#ifdef QCOM_ICS_COMPAT
+#ifdef QCOM_HARDWARE
 #include <gralloc_priv.h>
 #endif
 
@@ -272,6 +272,7 @@ void OMXCodec::findMatchingCodecs(
 
     const MediaCodecList *list = MediaCodecList::getInstance();
     if (list == NULL) {
+      ALOGE("mediacodec list instance returned NULL");
         return;
     }
 
@@ -1594,7 +1595,7 @@ status_t OMXCodec::setVideoOutputFormat(
                || format.eColorFormat == OMX_COLOR_FormatCbYCrY
                || format.eColorFormat == OMX_TI_COLOR_FormatYUV420PackedSemiPlanar
                || format.eColorFormat == OMX_QCOM_COLOR_FormatYVU420SemiPlanar
-
+               || format.eColorFormat == OMX_QCOM_COLOR_FormatYVU420PackedSemiPlanar32m4ka
                || format.eColorFormat == OMX_QCOM_COLOR_FormatYUV420PackedSemiPlanar64x32Tile2m8ka
                || format.eColorFormat == OMX_QCOM_COLOR_FormatYUV420PackedSemiPlanar32m
 #ifdef USE_SAMSUNG_COLORFORMAT
@@ -1893,6 +1894,8 @@ status_t OMXCodec::init() {
 
     err = allocateBuffers();
     if (err != (status_t)OK) {
+        CODEC_LOGE("Allocate Buffer failed - error = %d", err);
+        setState(ERROR);
         return err;
     }
 
@@ -2138,6 +2141,11 @@ status_t OMXCodec::allocateOutputBuffersFromNativeWindow() {
         format = (OMX_COLOR_FORMATTYPE)HAL_PIXEL_FORMAT_YCbCr_420_SP_TILED;
 #endif
 
+    ALOGV("set_buffers_geometry w %lu, h %lu format %d",
+            def.format.video.nFrameWidth,
+            def.format.video.nFrameHeight,
+            def.format.video.eColorFormat);
+
     err = native_window_set_buffers_geometry(
             mNativeWindow.get(),
             def.format.video.nFrameWidth,
@@ -2280,7 +2288,6 @@ status_t OMXCodec::allocateOutputBuffersFromNativeWindow() {
         info.mMem = NULL;
         info.mMediaBuffer = new MediaBuffer(graphicBuffer);
         info.mMediaBuffer->setObserver(this);
-        mPortBuffers[kPortIndexOutput].push(info);
 
         IOMX::buffer_id bufferId;
         err = mOMX->useGraphicBuffer(mNode, kPortIndexOutput, graphicBuffer,
@@ -2288,9 +2295,13 @@ status_t OMXCodec::allocateOutputBuffersFromNativeWindow() {
         if (err != 0) {
             CODEC_LOGE("registering GraphicBuffer with OMX IL component "
                     "failed: %d", err);
+            info.mMediaBuffer->setObserver(NULL);
+            info.mMediaBuffer->release();
+            info.mMediaBuffer = NULL;
             break;
         }
 
+        mPortBuffers[kPortIndexOutput].push(info);
         mPortBuffers[kPortIndexOutput].editItemAt(i).mBuffer = bufferId;
 
         CODEC_LOGV("registered graphic buffer with ID %p (pointer = %p)",
@@ -2857,6 +2868,11 @@ void OMXCodec::onEvent(OMX_EVENTTYPE event, OMX_U32 data1, OMX_U32 data2) {
         {
             CODEC_LOGV("OMX_EventPortSettingsChanged(port=%ld, data2=0x%08lx)",
                        data1, data2);
+
+            if (mState != EXECUTING) {
+                CODEC_LOGE("Ignore PortSettingsChanged event");
+                break;
+            }
 
             if (data2 == 0 || data2 == OMX_IndexParamPortDefinition) {
                 // There is no need to check whether mFilledBuffers is empty or not

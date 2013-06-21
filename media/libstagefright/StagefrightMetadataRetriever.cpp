@@ -245,7 +245,7 @@ static VideoFrame *extractVideoFrameWithCodecFlags(
 
     sp<MetaData> meta = decoder->getFormat();
 
-    int32_t width, height;
+    int32_t width, height, frame_width_rounded;
     CHECK(meta->findInt32(kKeyWidth, &width));
     CHECK(meta->findInt32(kKeyHeight, &height));
 
@@ -268,7 +268,28 @@ static VideoFrame *extractVideoFrameWithCodecFlags(
     frame->mHeight = crop_bottom - crop_top + 1;
     frame->mDisplayWidth = frame->mWidth;
     frame->mDisplayHeight = frame->mHeight;
+#ifndef QCOM_HARDWARE
     frame->mSize = frame->mWidth * frame->mHeight * 2;
+#else
+
+    int32_t srcFormat;
+    CHECK(meta->findInt32(kKeyColorFormat, &srcFormat));
+
+    frame_width_rounded = frame->mWidth;
+    switch (srcFormat) {
+        case OMX_QCOM_COLOR_FormatYVU420SemiPlanar:
+        case OMX_COLOR_FormatYUV420SemiPlanar:
+        case OMX_QCOM_COLOR_FormatYUV420PackedSemiPlanar64x32Tile2m8ka:
+            {
+                frame_width_rounded = ((frame->mWidth + 3)/4)*4;
+                break;
+            }
+        default:
+            break;
+    }
+
+    frame->mSize = frame_width_rounded * frame->mHeight * 2;
+#endif
     frame->mData = new uint8_t[frame->mSize];
     frame->mRotationAngle = rotationAngle;
 
@@ -280,8 +301,10 @@ static VideoFrame *extractVideoFrameWithCodecFlags(
         frame->mDisplayHeight = displayHeight;
     }
 
+#ifndef QCOM_HARDWARE
     int32_t srcFormat;
     CHECK(meta->findInt32(kKeyColorFormat, &srcFormat));
+#endif
 
     ColorConverter converter(
             (OMX_COLOR_FORMATTYPE)srcFormat, OMX_COLOR_Format16bitRGB565);
@@ -292,7 +315,11 @@ static VideoFrame *extractVideoFrameWithCodecFlags(
                 width, height,
                 crop_left, crop_top, crop_right, crop_bottom,
                 frame->mData,
+#ifdef QCOM_HARDWARE
+                frame_width_rounded,
+#else
                 frame->mWidth,
+#endif
                 frame->mHeight,
                 0, 0, frame->mWidth - 1, frame->mHeight - 1);
     } else {
