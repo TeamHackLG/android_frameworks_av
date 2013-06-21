@@ -67,7 +67,7 @@
 #include <sec_format.h>
 #endif
 
-#ifdef QCOM_HARDWARE
+#ifdef QCOM_ICS_COMPAT
 #include <gralloc_priv.h>
 #endif
 
@@ -2140,11 +2140,6 @@ status_t OMXCodec::allocateOutputBuffersFromNativeWindow() {
     if(format == OMX_QCOM_COLOR_FormatYUV420PackedSemiPlanar64x32Tile2m8ka)
         format = (OMX_COLOR_FORMATTYPE)HAL_PIXEL_FORMAT_YCbCr_420_SP_TILED;
 #endif
-
-    ALOGV("set_buffers_geometry w %lu, h %lu format %d",
-            def.format.video.nFrameWidth,
-            def.format.video.nFrameHeight,
-            def.format.video.eColorFormat);
 
     err = native_window_set_buffers_geometry(
             mNativeWindow.get(),
