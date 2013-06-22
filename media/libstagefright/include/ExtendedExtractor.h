@@ -37,7 +37,7 @@ class MediaExtractor;
 
 typedef MediaExtractor* (*MediaExtractorFactory)(const sp<DataSource> &source, const char* mime);
 
-#ifdef QCOM_LEGACY_OMX
+#ifdef QCOM_HARDWARE
 static const char* MEDIA_CREATE_EXTRACTOR = "createExtractor";
 #else
 static const char* MEDIA_CREATE_EXTRACTOR = "CreateExtractor";
@@ -57,7 +57,7 @@ class ExtendedExtractor
 public:
     static MediaExtractor* CreateExtractor(const sp<DataSource> &source, const char *mime);
 
-#ifdef QCOM_LEGACY_OMX
+#ifdef QCOM_HARDWARE
     static void RegisterSniffers();
 #endif
 };

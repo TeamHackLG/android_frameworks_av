@@ -399,7 +399,7 @@ uint32_t OMXCodec::getComponentQuirks(
     }
 #endif
 
-#ifdef QCOM_LEGACY_OMX
+#ifdef QCOM_HARDWARE
     if (list->codecHasQuirk(
                 index, "requires-larger-encoder-output-buffer")) {
             quirks |= kRequiresLargerEncoderOutputBuffer;
@@ -1182,7 +1182,7 @@ void OMXCodec::setVideoInputFormat(
 
     video_def->nFrameWidth = width;
     video_def->nFrameHeight = height;
-#ifdef QCOM_LEGACY_OMX
+#ifdef QCOM_HARDWARE
     video_def->xFramerate = (frameRate << 16);
 #else
     video_def->xFramerate = 0;      // No need for output port

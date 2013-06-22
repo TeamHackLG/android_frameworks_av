@@ -33,7 +33,7 @@
 
 #include "include/ExtendedExtractor.h"
 
-#ifdef QCOM_LEGACY_OMX
+#ifdef QCOM_HARDWARE
 static const char* EXTENDED_PARSER_LIB = "libmmparser.so";
 #else
 static const char* EXTENDED_PARSER_LIB = "libExtendedExtractor.so";
@@ -87,7 +87,7 @@ MediaExtractor* ExtendedExtractor::CreateExtractor(const sp<DataSource> &source,
     return extractor;
 }
 
-#ifdef QCOM_LEGACY_OMX
+#ifdef QCOM_HARDWARE
 void ExtendedExtractor::RegisterSniffers() {
     void *extendedParserLib = ExtendedParserLib();
     if (extendedParserLib == NULL) {
