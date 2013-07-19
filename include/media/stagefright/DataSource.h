@@ -77,7 +77,7 @@ public:
             const sp<DataSource> &source, String8 *mimeType,
             float *confidence, sp<AMessage> *meta);
 
-#ifdef QCOM_HARDWARE
+#ifdef QCOM_LEGACY_OMX
     //isExtendedExtractor if true, will store the location of the sniffer to register
     static void RegisterSniffer(SnifferFunc func, bool isExtendedExtractor = false);
 #else
@@ -104,7 +104,7 @@ private:
     static Mutex gSnifferMutex;
     static List<SnifferFunc> gSniffers;
 
-#ifdef QCOM_HARDWARE
+#ifdef QCOM_LEGACY_OMX
     static List<SnifferFunc>::iterator extendedSnifferPosition;
 #endif
 
