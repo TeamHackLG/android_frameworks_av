@@ -674,6 +674,7 @@ status_t ACodec::allocateOutputBuffersFromNativeWindow() {
         info.mStatus = BufferInfo::OWNED_BY_US;
         info.mData = new ABuffer(0);
         info.mGraphicBuffer = graphicBuffer;
+        mBuffers[kPortIndexOutput].push(info);
 
         IOMX::buffer_id bufferId;
         err = mOMX->useGraphicBuffer(mNode, kPortIndexOutput, graphicBuffer,
@@ -684,7 +685,6 @@ status_t ACodec::allocateOutputBuffersFromNativeWindow() {
             break;
         }
 
-        mBuffers[kPortIndexOutput].push(info);
         mBuffers[kPortIndexOutput].editItemAt(i).mBufferID = bufferId;
 
         ALOGV("[%s] Registered graphic buffer with ID %p (pointer = %p)",
@@ -1590,7 +1590,6 @@ status_t ACodec::setSupportedOutputFormat() {
            || format.eColorFormat == OMX_COLOR_FormatCbYCrY
            || format.eColorFormat == OMX_TI_COLOR_FormatYUV420PackedSemiPlanar
            || format.eColorFormat == OMX_QCOM_COLOR_FormatYVU420SemiPlanar
-           || format.eColorFormat == OMX_QCOM_COLOR_FormatYVU420PackedSemiPlanar32m4ka
            || format.eColorFormat == OMX_QCOM_COLOR_FormatYUV420PackedSemiPlanar64x32Tile2m8ka
            || format.eColorFormat == OMX_QCOM_COLOR_FormatYUV420PackedSemiPlanar32m );
 
